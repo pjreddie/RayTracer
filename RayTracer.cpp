@@ -197,12 +197,6 @@ struct Tracer{
 					break;
 				}
 			}
-<<<<<<< HEAD:Ray.cpp
-			if(ind != -1) {}else{
-				c.r = objects[ind].color.r;
-				c.g = objects[ind].color.g;
-				c.b = objects[ind].color.b;
-=======
 			if(indShadow != -1) {
 				cout << minDist << endl;	
 			}else{
@@ -210,7 +204,6 @@ struct Tracer{
 				c.r = objects[indSource].color.r;
 				c.g = objects[indSource].color.g;
 				c.b = objects[indSource].color.b;
->>>>>>> b99c5f6d096c7f0d0731e6a492e73d67a7346731:RayTracer.cpp
 			}
 		}
 		return c;
