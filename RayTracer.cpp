@@ -10,7 +10,7 @@ using namespace std;
 #define PIXSIZE .05
 #define INF 999999.9
 #define FLEN 10
-
+#define ERR 0.0001
 struct Point{
 	double x,y,z;
 	void print(){
@@ -100,16 +100,16 @@ struct Sphere{
 		double t = (-.5 * sqrt(pow(-2.*l.v.x*c.x + 2.*l.v.x*l.p.x - 2.*l.v.y*c.y + 2.*l.v.y*l.p.y - 2.*l.v.z*c.z + 2.*l.v.z*l.p.z, 2.) - 4.*(pow(l.v.x, 2.) + pow(l.v.y, 2.) + pow(l.v.z, 2.))*(pow(c.x, 2.) - 2.*(c.x*l.p.x) + pow(c.y, 2.) - 2.*c.y*l.p.y + pow(c.z, 2.) - 2.*c.z*l.p.z - pow(r, 2.) + pow(l.p.x, 2.) + pow(l.p.y, 2.) + pow(l.p.z, 2.))) + l.v.x*c.x - l.v.x*l.p.x + l.v.y*c.y - l.v.y*l.p.y + l.v.z*c.z - l.v.z*l.p.z)/(pow(l.v.x, 2.) + pow(l.v.y, 2.) + pow(l.v.z, 2.));
 		double t2 = (.5 * sqrt(pow(-2.*l.v.x*c.x + 2.*l.v.x*l.p.x - 2.*l.v.y*c.y + 2.*l.v.y*l.p.y - 2.*l.v.z*c.z + 2.*l.v.z*l.p.z, 2.) - 4.*(pow(l.v.x, 2.) + pow(l.v.y, 2.) + pow(l.v.z, 2.))*(pow(c.x, 2.) - 2.*(c.x*l.p.x) + pow(c.y, 2.) - 2.*c.y*l.p.y + pow(c.z, 2.) - 2.*c.z*l.p.z - pow(r, 2.) + pow(l.p.x, 2.) + pow(l.p.y, 2.) + pow(l.p.z, 2.))) + l.v.x*c.x - l.v.x*l.p.x + l.v.y*c.y - l.v.y*l.p.y + l.v.z*c.z - l.v.z*l.p.z)/(pow(l.v.x, 2.) + pow(l.v.y, 2.) + pow(l.v.z, 2.));
 		if (t < t2){
-			if (t >= 0.){
+			if (t > ERR){
 				return Point(l.p.x + t*l.v.x, l.p.y + t*l.v.y, l.p.z + t*l.v.z);
-			}else if(t2 >= 0.){
+			}else if(t2 > ERR){
 				return Point(l.p.x + t2*l.v.x, l.p.y + t2*l.v.y, l.p.z + t2*l.v.z);	
 			}else{
 				return Point(INF, INF, INF);
 			}
-		}else if(t2 >= 0.){
+		}else if(t2 > ERR){
 			return Point(l.p.x + t2*l.v.x, l.p.y + t2*l.v.y, l.p.z + t2*l.v.z);
-		}else if(t >= 0.){
+		}else if(t > ERR){
 			return Point(l.p.x + t*l.v.x, l.p.y + t*l.v.y, l.p.z + t*l.v.z);
 		}else{
 			return Point(INF, INF, INF);
@@ -136,7 +136,6 @@ vector<Sphere> read(const char *const name){
 	int r,g,b;
 	vector<Sphere> obj;
 	while (file >> x>>y>>z>>rad>>r>>g>>b){
-		cout << x << " " << y << " " << z << " " << rad << " " << r << " " << g << " " << b << endl;
 		obj.push_back(Sphere(Point(x,y,z),rad,Color((char)r,(char)g,(char)b)));
 	}
 	return obj;
@@ -170,22 +169,22 @@ struct Tracer{
 	}
 	Color traceRay(Line &l){
 		Color c(0,0,0);
-		int ind = -1;
-		int minDist = INF;
+		int indSource = -1;
+		double minDist = INF;
 		Point minPoint(INF, INF, INF);
 		for (int o = 0; o < objects.size(); ++o){
 			Point intersect = objects[o].intersection(l);
 			double dist = intersect.dist(*focal);
 			if (dist < minDist){
 				minDist = dist;
-				ind = o;
+				indSource = o;
 				minPoint = intersect;
 			}
 		}
-		if (ind != -1){
+		if (indSource != -1){
 			Line shadow(minPoint, *light);
-			int ind = -1;
-			int minDist = INF;
+			int indShadow = -1;
+			double minDist = INF;
 			Point minPoint(INF, INF, INF);
 
 			for (int o = 0; o < objects.size(); ++o){
@@ -193,16 +192,25 @@ struct Tracer{
 				double dist = intersect.dist(*focal);
 				if (dist < minDist){
 					minDist = dist;
-					ind = o;
+					indShadow = o;
 					minPoint = intersect;
 					break;
 				}
-
 			}
+<<<<<<< HEAD:Ray.cpp
 			if(ind != -1) {}else{
 				c.r = objects[ind].color.r;
 				c.g = objects[ind].color.g;
 				c.b = objects[ind].color.b;
+=======
+			if(indShadow != -1) {
+				cout << minDist << endl;	
+			}else{
+				cout << "hey";
+				c.r = objects[indSource].color.r;
+				c.g = objects[indSource].color.g;
+				c.b = objects[indSource].color.b;
+>>>>>>> b99c5f6d096c7f0d0731e6a492e73d67a7346731:RayTracer.cpp
 			}
 		}
 		return c;
