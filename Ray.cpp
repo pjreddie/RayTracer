@@ -7,7 +7,7 @@ using namespace cimg_library;
 using namespace std;
 #define WIDTH 640
 #define HEIGHT 400
-#define PIXSIZE .1
+#define PIXSIZE .05
 #define INF 999999.9
 #define FLEN 10
 
@@ -189,28 +189,31 @@ struct Tracer{
 			Point minPoint(INF, INF, INF);
 
 			for (int o = 0; o < objects.size(); ++o){
-				Point intersect = objects[o].intersection(l);
+				Point intersect = objects[o].intersection(shadow);
 				double dist = intersect.dist(*focal);
 				if (dist < minDist){
 					minDist = dist;
 					ind = o;
 					minPoint = intersect;
+					break;
 				}
 
 			}
-			c.r = objects[ind].color.r;
-			c.g = objects[ind].color.g;
-			c.b = objects[ind].color.b;
+			if(ind != -1) {}else{
+				c.r = objects[ind].color.r;
+				c.g = objects[ind].color.g;
+				c.b = objects[ind].color.b;
+			}
 		}
 		return c;
 	}
 
 
 	void drawScene(){
-		for (int i = 0; i < WIDTH; ++i){
-			for(int j = 0; j < HEIGHT; ++j){
+		for (int j = 0; j < HEIGHT; ++j){
+			for(int i = 0; i < WIDTH; ++i){
 				double xoff = (i-WIDTH/2)*PIXSIZE;
-				double yoff = (j-HEIGHT/2)*PIXSIZE;
+				double yoff = (HEIGHT/2-j)*PIXSIZE;
 				Point px = (*focal)+(*dir)+xoff*(*horz) + yoff*(*vert);
 				Line l(*focal, px);
 
@@ -221,7 +224,7 @@ struct Tracer{
 				(*img)(i,j,2) = c.b;
 
 			}
-		}	
+		}
 	}
 };
 
