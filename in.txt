@@ -1,6 +1,56 @@
--20.0	0.0 	50.0 	5.0 	380 	495 	1 	0 	0 	0
--10.0 	0.0 	50.0 	5.0 	620 	750 	1 	0 	0	0
-0.0 	0.0 	50.0 	5.0 	380 	450 	.0 	1 	0 	0
-10.0 	0.0 	50.0 	5.0 	495 	570 	.5 	.5 	0 	0
-20.0 	0.0 	50.0 	5.0 	380 	750 	.8 	.2 	0 	0
-0.0 	0.0 	20.0	10.0 	380 	500 	.0 	.2 	.8 	1.1
+Sphere	
+	Point	-40.0	-10.0 	50.0 
+	Radius	10.0
+	Surface	380 	400 	.95	.05 .0 	1.1
+Sphere	
+	Point	-20.0 	-10.0 	60.0 
+	Radius	10.0
+	Surface	700 	750 	.9 	.1 	0	0
+Sphere
+	Point	0.0 	-10.0 	70.0
+	Radius	10.0
+	Surface	380 	450 	.0 	1 	0 	0
+Sphere
+	Point	20.0 	-10.0 	80.0
+	Radius	10.0
+	Surface	495 	570 	.5 	.5 	0 	0
+Sphere
+	Point	40.0 	-10.0 	90.0
+	Radius	10.0
+	Surface	380 	750 	.1 	.2 	0.7 1.1
+Plane
+	Point	00.0	-20.0	00.0
+	Vector	00.0	1.00	0.0
+	Surface	380		750		.15	.1	0	0
+Mesh
+	Polygon
+		Point	10.0	-10.0	60.
+		Point	5.0 	0.00	60.
+		Point	10.0	0.00	50.
+		Surface 380	550	1	0	0	0	
+	Polygon
+		Point	15.0	0.00	60.
+		Point	10.0 	-10		60.
+		Point	10.0	0.00	50.
+		Surface 380	550	1	0	0	0
+	Polygon
+		Point	15.0	0.00	60.
+		Point	5.0 	0.00	60.
+		Point	10.0	-10.0	60.
+		Surface 380	550	1	0	0	0
+	Polygon
+		Point	10.0	10.00	60.
+		Point	5.0 	0.00	60.
+		Point	10.0	0.00	50.
+		Surface 380	550	1	0	0	0	
+	Polygon
+		Point	15.0	0.00	60.
+		Point	10.0 	10.00	60.
+		Point	10.0	0.00	50.
+		Surface 380	550	1	0	0	0
+	Polygon
+		Point	15.0	0.00	60.
+		Point	5.0 	0.00	60.
+		Point	10.0	10.00	60.
+		Surface 380	550	1	0	0	0
+	Surface 380	550	1	1	1	1.3	
