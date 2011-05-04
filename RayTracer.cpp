@@ -7,13 +7,13 @@
 #include <string>
 using namespace cimg_library;
 using namespace std;
-#define WIDTH 2000
-#define HEIGHT 1250
-#define PIXSIZE .0125
+#define WIDTH 800
+#define HEIGHT 600
+#define PIXSIZE .02
 #define INF 999999.9
 #define FLEN 10
 #define ERR 0.0001
-#define AMBIENT .1
+#define AMBIENT 1
 #define NUMWAVES 20
 #define PI 3.14159265
 #define MAXDEPTH 4
@@ -69,12 +69,14 @@ struct Spectrum{
 				spectrum[i] = 1.;
 			}
 		}
+		//normalize(360);
 	}
 	Spectrum(vector<double> &_spectrum){
 		spectrum = _spectrum;
 	}
 	Spectrum(){
 		spectrum = vector<double>(NUMWAVES, 0.0);
+
 	}
 	Spectrum operator*(const Spectrum &s){
 		vector<double> newspec(NUMWAVES, 0.0);
@@ -105,6 +107,23 @@ struct Spectrum{
 			sum += spectrum[i]*size;
 		}
 		return sum;
+	}
+	void normalize(double i){
+		double curri = integral();
+		for(int j = 0; j < NUMWAVES; ++j){
+			spectrum[j] = spectrum[j]*i/curri;
+		}
+	}
+	void scaleTo(double i){
+		double maxv = 0;
+		for(int j = 0; j < NUMWAVES; ++j){
+			maxv = max(maxv, spectrum[j]);
+		}
+		if(maxv > 0.0){
+			for(int j = 0; j < NUMWAVES; ++j){
+				spectrum[j] = spectrum[j]*i/maxv;
+			}
+		}
 	}
 	void print(){
 		double maxVal = 0;
@@ -144,6 +163,45 @@ struct Spectrum{
 	   }
 	 */
 };
+
+Spectrum red;
+Spectrum green;
+Spectrum blue;
+
+Spectrum magentaSpec(){
+     Spectrum r(600,750);
+     Spectrum b(380,500);
+     Spectrum g(500, 600);
+     Spectrum m = r+b*.5 + g*.1;
+     m.scaleTo(1.);
+     return m;
+}   
+Spectrum redSpec(){
+     Spectrum r(600,750);
+     Spectrum b(380,500);
+     Spectrum g(500, 600);
+     Spectrum m = r+b*.1 + g*.1;
+     m.scaleTo(1.);
+     return m;
+}   
+Spectrum blueSpec(){
+     Spectrum r(600,750);
+     Spectrum b(380,500);
+     Spectrum g(500, 600);
+     Spectrum m = r*.2+b+ g*.2;
+     m.scaleTo(1.);
+     return m;
+}   
+Spectrum greenSpec(){
+     Spectrum r(600,750);
+     Spectrum b(380,500);
+     Spectrum g(500, 600);
+     Spectrum m = r*.2+b*.2 + g;
+     m.scaleTo(1.);
+     return m;
+}   
+
+
 ostream &operator<<(ostream &stream, Spectrum &s){
 	double maxVal = 0;
 	for(int i = 0; i < NUMWAVES; ++i){
@@ -160,9 +218,23 @@ ostream &operator<<(ostream &stream, Spectrum &s){
 	return stream;
 }
 istream &operator>>(istream &stream, Spectrum &s){
+	string st;
+	stream >> st;
+	if(st.compare("Magenta")== 0){
+		s = magentaSpec();
+		return stream;
+	}else if(st.compare("Red") == 0){
+		s = redSpec();
+		return stream;
+	}else{
+		for(int i = st.size()-1; i >= 0; --i){
+			stream.putback(st[i]);
+		}
+	}
 	double low, high;
 	stream >> low >> high;
 	s = Spectrum(low, high);
+	//s.normalize(1.);
 	return stream;
 }
 
@@ -182,21 +254,75 @@ Spectrum colorSpec(double mu, double s){
 	return Spectrum(spec);
 }
 
-Spectrum red;
-Spectrum green;
-Spectrum blue;
 
-RGB toRGB(Spectrum &s){
-	double size = 370/NUMWAVES;
-	double r = (red*s).integral();
-	double g = (green*s).integral();
-	double b = (blue*s).integral();
-	double mag = max(r,max(g,b));
-	r /= mag;
-	g /= mag;
-	b /= mag;
-	return RGB((char) (r*255),(char) (g*255),(char) (b*255));
-}
+struct XYZ{
+	double x;
+	double y;
+	double z;
+	double maxv;
+
+	XYZ(Spectrum s){
+		x = (red*s).integral();
+		y = (green*s).integral();
+		z = (blue*s).integral();
+		maxv = max(x, max(y,z));
+		double intensity = s.integral();
+		if (maxv != 0.0){
+			x /= maxv;
+			y /= maxv;
+			z /= maxv;
+		}
+		x *= intensity;
+		y *= intensity;
+		z *= intensity;
+	}
+	XYZ(){
+		x = 0;
+		y = 0;
+		z = 0;
+		maxv = 1;
+	}
+	RGB rgb(){
+	/*	
+		double r = 3.2406*x + -1.5372*y + -.4986*z;
+		double g = -.9689*x + 1.8758*y + .0415*z;
+		double b = .0557*x + -.204*y + 1.057*z;
+
+		r *= scale;
+		g *= scale;
+		b *= scale;
+
+		double a = .055;
+
+		if(r <= .0031308){
+			r *= 12.92;
+		}else{
+			r = pow(r, 1./2.4)*(1+a) - a;
+		}
+
+		if(g <= .0031308){
+			g *= 12.92;
+		}else{
+			g = pow(g, 1./2.4)*(1+a) - a;
+		}
+
+		if(b <= .0031308){
+			b *= 12.92;
+		}else{
+			b = pow(b, 1./2.4)*(1+a) - a;
+		}
+		double sum = r+g+b;
+		r = r/sum;
+		g = g/sum;
+		b = b/sum;
+*/
+		double r = min(x*255, 255.);
+		double g = min(y*255, 255.);
+		double b = min(z*255, 255.);
+
+		return RGB((char) r,(char) g,(char) b);
+	}
+};
 
 RGB operator*(const RGB &c, const double &d){
 	double scale = min((255./max(c.r, max(c.g, c.b))), d);
@@ -205,57 +331,35 @@ RGB operator*(const RGB &c, const double &d){
 
 struct Surface{
 	Spectrum spectrum;
-	double diffuse, specular, transmissive, refraction;
-	Surface(Spectrum _spectrum, double _diffuse, double _specular, double _transmissive, double _refraction){
+	double diffuse, specular, transmissive, refraction, smoothness;
+	Surface(Spectrum _spectrum, double _diffuse, double _specular, double _transmissive, double _refraction, double _smoothness){
 		spectrum = _spectrum;
 		diffuse = _diffuse;
 		specular = _specular;
 		transmissive = _transmissive;
 		refraction = _refraction;
+		smoothness = _smoothness;
+		//spectrum.normalize(1.);
 	}
 	Surface(){
 	}
 };
 ostream &operator<<(ostream &stream, Surface &s){
 	stream << s.spectrum;
-	stream << s.diffuse << ", " << s.specular <<", " << s.transmissive << ", " << s.refraction << endl;
+	stream << s.diffuse << ", " << s.specular <<", " << s.transmissive << ", " << s.refraction << ", " << s.smoothness << endl;
 	return stream;
 }
 istream &operator>>(istream &stream, Surface &s){
 	string st;
-	stream >> s.spectrum >> s.diffuse >> s.specular >> s.transmissive >> s.refraction;
+	stream >> st;
+	if(st.compare("None") == 0) return stream;
+	assert(st.compare("Spectrum") == 0);
+	stream >> s.spectrum;
+	stream >> st;
+	assert (st.compare("Constants") == 0);
+	stream >>s.diffuse >> s.specular >> s.transmissive >> s.refraction >> s.smoothness;
 	return stream;
 }
-
-struct Photon{
-	Spectrum spectrum;
-	double intensity;
-	Photon(double low, double high, double _intensity){
-		spectrum = Spectrum(low, high); 
-		intensity = _intensity;	
-	}
-	Photon(){
-		spectrum = Spectrum();
-		intensity = 0;
-	}
-	Photon(Spectrum &s, double &d){
-		spectrum = s;
-		intensity = d;
-	}
-	RGB rgb(){
-		return toRGB(spectrum)*intensity;
-	}
-	Photon operator+(Photon &q){
-		double pint = spectrum.integral();
-		if(pint == 0.0) return q;
-		double qint = q.spectrum.integral();
-		if(qint == 0.0) return Photon(spectrum, intensity);
-		Spectrum spec  = spectrum*(intensity/pint) + q.spectrum*(q.intensity/qint); 
-		double ints  = intensity + q.intensity;
-		return Photon( spec, ints );
-	}
-};
-
 
 struct Vector{
 	double x, y, z;
@@ -363,6 +467,142 @@ struct Object{
 	virtual Vector normal(Ray &r) = 0;
 	virtual Point intersection(Ray &l) = 0;
 };
+
+struct Quadric : public Object{ 
+	double A,B,C,D,E,F,G,H,I,J;
+	Quadric(){
+	A = B = C = D = E = F = G = H = I = J = 0;
+	}
+	Quadric(double _A, double _B, double _C, double _D, double _E, double _F, double _G, double _H, double _I, double _J){
+	A = B = C = D = E = F = G = H = I = J = 0;
+	}
+	virtual Point intersection(Ray &r){
+		r.v.normalize();
+		/*double NB = 2*B;
+		double NC = 2*C;
+		double ND = 2*D;
+		double NF = 2*F;
+		double NG = 2*G;
+		double NI = 2*I;
+
+		double Cq = r.p.x*(A*r.p.x + NB*r.p.y + NC*r.p.z + ND) + \
+					r.p.y*(E*r.p.y + NF*r.p.z + NG) + \
+					r.p.z*(H*r.p.z + NI) + J;
+
+		double NBq = r.v.x*(A*r.p.x + B*r.p.y + C*r.p.z + D) + \
+					r.v.y*(B*r.p.x + E*r.p.y + F*r.p.z + G) + \
+					r.v.z*(C*r.p.x + F*r.p.y + H*r.p.z + I);
+
+		double Aq = r.v.x*(A*r.v.x + NB*r.v.y + NC*r.v.z) + \
+					r.v.y*(E*r.v.y + NF*r.v.z) + \
+					H*r.v.z*r.v.z;
+		if(Aq == 0.){
+			return Point(INF, INF,INF);
+		}
+		double Ka = -NBq/Aq;
+		double Kb = Cq/Aq;
+		double det = Ka*Ka - Kb;
+		if(det < 0.){
+			return Point(INF, INF , INF);
+		}
+
+		
+		double t0 = Ka - sqrt(det);
+		double t1 = Ka + sqrt(det);
+		
+		if (t0 < ERR && t1 < ERR){
+			return Point(INF, INF , INF);
+		}
+		if (t0 < ERR) t0 = INF;
+		if(t1 < ERR) t1 = INF;
+		t0 = min(t1, t0);
+		return r.p + t0*r.v;
+		*/
+		Vector V1(r.v.x*r.v.x, r.v.y*r.v.y, r.v.z*r.v.z);
+		Vector V2 = 2.*Vector(r.v.x*r.v.y, r.v.y*r.v.z, r.v.x*r.v.z);
+		Vector V3 = 2.*Vector(r.v.x*r.p.x, r.v.y*r.p.y, r.v.z*r.p.z);
+		Vector V4 = 2.*Vector(r.v.x*r.p.y + r.p.x*r.v.y, r.v.y*r.p.z + r.p.y*r.v.z, r.v.x*r.p.z + r.p.x*r.v.z);
+		Vector V5 = 2.*Vector(r.v.x, r.v.y, r.v.z);
+		Vector V6(r.p.x*r.p.x, r.p.y*r.p.y, r.p.z*r.p.z);
+		Vector V7 = 2.*Vector(r.p.x*r.p.y, r.p.y*r.p.z, r.p.x*r.p.z);
+		Vector V8 = 2.*Vector(r.p.x, r.p.y, r.p.z);
+
+		Vector Q1(A,B,C);
+		Vector Q2(D,E,F);
+		Vector Q3(G,H,I);
+
+		double a = dot(Q1, V1) + dot(Q2, V2);
+		double b = dot(Q1, V3) + dot(Q2, V4) + dot(Q3, V5);
+		double c = dot(Q1, V6) + dot(Q2, V7) + dot(Q3, V8) + J;
+
+		double det = b*b-4*a*c;
+		if(det < 0 || a == 0.) return Point(INF, INF, INF);
+		double t0 = (-b + sqrt(det))/(2*a);
+		double t1 = (-b -sqrt(det))/(2*a);
+
+		if (t0 < ERR && t1 < ERR){
+			return Point(INF, INF , INF);
+		}
+		if (t0 < ERR) t0 = INF;
+		if(t1 < ERR) t1 = INF;
+		t0 = min(t1, t0);
+		return r.p + t0*r.v;
+	}
+	virtual Vector normal(Ray &r){
+		double xn = 2*(A*r.p.x + D*r.p.y + F*r.p.z + G);	
+		double yn = 2*(D*r.p.x + B*r.p.y + E*r.p.z + H);	
+		double zn = 2*(F*r.p.x + E*r.p.y + C*r.p.z + I);	
+		Vector n(xn, yn, zn);
+		if(dot(n, r.v) > -ERR) return n;
+		return -n;
+	}
+};
+istream &operator>>(istream &stream, Quadric &q){
+	string s;
+	stream >> s;
+	assert(s.compare("Constants") == 0);
+	stream >> q.A >> q.B >> q.C >> q.D >> q.E >> q.F >> q.G >> q.H >> q.I >> q.J;
+	stream >> s;
+	assert(s.compare("Surface") == 0);
+	stream >> q.surface;
+	return stream;
+}
+
+struct Ellipsoid : public Quadric{
+	Ellipsoid(){
+	}
+	Ellipsoid(Point p, double xr, double yr, double zr, Surface s){
+		A = 1/(xr*xr);
+		B = 1/(yr*yr);
+		C = 1/(zr*zr);
+		D = 0;
+		E = 0;
+		F = 0;
+		G = -p.x/(xr*xr);
+		H = -p.y/(yr*yr);
+		I = -p.z/(zr*zr);
+		J = p.x*p.x/(xr*xr) + p.y*p.y/(yr*yr) + p.z*p.z/(zr*zr)-1;
+		surface = s;
+	}
+};
+istream &operator>>(istream &stream, Ellipsoid &e){
+	string s;
+	stream >> s;
+	assert(s.compare("Center") == 0);
+	Point c;
+	stream >> c;
+	stream >> s;
+	assert(s.compare("Radii") == 0);
+	double x,y,z;
+	stream >> x >> y >> z;
+	stream >> s;
+	assert(s.compare("Surface") == 0);
+	Surface f;
+	stream >> f;
+	e = Ellipsoid(c, x,y,z, f);
+
+	return stream;
+}
 
 struct Plane : public Object{
 	Point p;
@@ -501,7 +741,7 @@ vector<Point2d> collapsePoints(vector<Point> &p, int ind){
 }
 struct Polygon : Plane{
 	vector<Point> bounds;
-	vector<Line2d> collapsedBounds;
+	vector<Point2d> collapsedPoints;
 	int collapse;
 	Polygon(){
 		collapse = 0;
@@ -526,28 +766,23 @@ struct Polygon : Plane{
 		}else{
 			collapse = 2;
 		}
-		vector<Point2d> cpts = collapsePoints(bounds, collapse);
-		collapsedBounds = vector<Line2d>();
-		for(int i = 0; i < cpts.size()-1; ++i){
-			collapsedBounds.push_back(Line2d(cpts[i], cpts[i+1]));
-		}
-		collapsedBounds.push_back(Line2d(cpts[cpts.size()-1], cpts[0]));
+		collapsedPoints = collapsePoints(bounds, collapse);
+		collapsedPoints.push_back(collapsedPoints[0]);
 	}
-	
+
 	bool isIn(Point &p){	
 		if(p.x == INF) return false;
 		Point2d testC = collapsePoint(p, collapse);
-		int numInt = 0;
-		Ray2d testRay(testC, Vector2d(1., 0));
-		for(int i = 0; i < collapsedBounds.size(); ++i){
-			if(testRay.intersectSegment(collapsedBounds[i])){
-				++numInt;
+		bool in = false;
+
+		for(int i = 0; i < collapsedPoints.size()-1; ++i){
+			if((testC.y <= collapsedPoints[i].y) == (testC.y > collapsedPoints[i+1].y) && testC.x - collapsedPoints[i].x - (testC.y-collapsedPoints[i].y)*(collapsedPoints[i+1].x - collapsedPoints[i].x)/(collapsedPoints[i+1].y - collapsedPoints[i].y)<0.0){
+				in = !in;
 			}
 		}
-		if(numInt%2 == 1) return true;
-		return false;
+		return in;
 	}
-	
+
 	virtual Point intersection(Ray &r){
 		Point test = Plane::intersection(r);
 		if (isIn(test)) return test;
@@ -669,8 +904,6 @@ struct Sphere : public Object{
 		}
 	}
 };
-
-
 istream &operator>>(istream &stream, Sphere &p){
 	string s;
 	stream >> s;
@@ -684,24 +917,65 @@ istream &operator>>(istream &stream, Sphere &p){
 	stream >> p.surface;
 	return stream;
 }
+struct Light{
+	Point p;
+	Spectrum spectrum;
+	double intensity;
+	Light(Point _p, Spectrum _spectrum, double _intensity){
+		p = _p;
+		spectrum = _spectrum;
+		intensity = _intensity;
+	}
+	Light(){
+
+	}
+};
+
+istream &operator >>(istream &stream, Light &l){
+	string s;
+	stream >> s;
+	assert(s.compare("Point") == 0);
+	stream >> l.p;
+	stream >> s;
+	assert(s.compare("Spectrum") == 0);
+	stream >> l.spectrum;
+	stream >> s;
+	assert(s.compare("Intensity")== 0);
+	stream >> l.intensity;
+	l.spectrum.normalize(l.intensity);
+	return stream;
+}
+
+Vector randVector(double jiggle){
+	double x = (double) rand()/(double) RAND_MAX;
+	double y = (double) rand()/(double) RAND_MAX;
+	double z = (double) rand()/(double) RAND_MAX;
+	return Vector(x/jiggle, y/jiggle, z/jiggle);
+}
+
 struct Tracer{
-	Point *light;
 	Point *focal;
-	Spectrum lightSpectrum;
 	Vector *dir;
 	Vector *horz;
 	Vector *vert;
-	CImg<unsigned char> *img;
+	CImg<char> *img;
 	vector<Object *> objects;
+	vector<Light> lights;
+	Spectrum ambient;
+	int width;
+	int height;
+	double pixsize;
 
 	Tracer(){
-		light = new Point(1000.0, 1000.0, 0);
-		focal = new Point(0.0,0.0,-10.0);
-		dir = new Vector(0.0, 0.0, 10.0);
+		focal = new Point(0.0,20.0,-30.0);
+		dir = new Vector(0.0, 0.0, 1.0);
 		horz = new Vector(1.0, 0.0, 0.0);
 		vert = new Vector(0.0, 1.0, 0.0);
-		img = new CImg<unsigned char>(WIDTH,HEIGHT,1,3,0);
-		lightSpectrum = Spectrum(380,750);
+		ambient = Spectrum(380, 750);
+		ambient.normalize(AMBIENT);
+		width = WIDTH;
+		height = HEIGHT;
+		pixsize = .0015*500/WIDTH;
 	}
 	void read(const char *const name){
 		ifstream file;
@@ -720,23 +994,48 @@ struct Tracer{
 				Polygon *p = new Polygon();
 				file >> *p;
 				objects.push_back(p);
-			}
-			else if(type.compare("Mesh") == 0){
+			}else if(type.compare("Mesh") == 0){
 				Mesh *m = new Mesh();
 				file >> *m;
 				objects.push_back(m);
+			}else if(type.compare("Quadric") == 0){
+				Quadric *q = new Quadric();
+				file >> *q;
+				objects.push_back(q);
+			}else if(type.compare("Ellipsoid") == 0){
+				Ellipsoid *e = new Ellipsoid();
+				file >> *e;
+				objects.push_back(e);
+			}else if(type.compare("Light") == 0){
+				Light l;
+				file >> l;
+				lights.push_back(l);
+			}else if(type.compare("Ambient") == 0){
+				double a;
+				file >> a;
+				ambient.normalize(a);
+			}else if(type.compare("Height") == 0){
+				file >> height;
+			}else if(type.compare("Width") == 0){
+				file >> width;
+				pixsize = .003*500/width;
+			}else if(type.compare("Pixel") == 0){
+				file >> pixsize;
+			}else if(type.compare("Focal") == 0){
+				file >> (*focal);
 			}
-			
+
 		}
 	}
-	Photon traceRay(Ray &l, int depth, int currObject){
-		Photon returnLight(380., 750., 0.);
+	Spectrum traceRay(Ray &l, int depth, int currObject){
+		Spectrum returnLight;
+
 		int indSource = -1;
 		double minDist = INF;
 		Point minPoint(INF, INF, INF);
 		for (int o = 0; o < objects.size(); ++o){
 			Point intersect = objects[o]->intersection(l);
-			double dist = intersect.dist(*focal);
+			double dist = intersect.dist(l.p);
 			if (dist < minDist){
 				minDist = dist;
 				indSource = o;
@@ -744,21 +1043,6 @@ struct Tracer{
 			}
 		}
 		if (indSource != -1){
-			Ray shadow(minPoint, *light);
-			int indShadow = -1;
-			double minDistS = INF;
-			Point minPointS(INF, INF, INF);
-
-			for (int o = 0; o < objects.size(); ++o){
-				Point intersect = objects[o]->intersection(shadow);
-				double dist = intersect.dist(*focal);
-				if (dist < minDistS){
-					minDistS = dist;
-					indShadow = o;
-					minPointS = intersect;
-					break;
-				}
-			}
 			int nextObject = indSource;
 			if(currObject == indSource){
 				nextObject = -1;
@@ -769,18 +1053,31 @@ struct Tracer{
 			Ray backwardRay(minPoint, backwardView);
 			Vector surfaceNormal = objects[indSource]->normal(backwardRay);
 			surfaceNormal.normalize();
-			
-			Vector lightVector = shadow.v;
-			lightVector.normalize();
-			
+
+
 			if (depth < MAXDEPTH && objects[indSource]->surface.specular > 0.0){
 				Vector backwardReflection = viewVector - 2.*dot(viewVector, surfaceNormal)*surfaceNormal;
-				Ray reflectedRay(minPoint, backwardReflection);
-				Photon reflectedPhoton = traceRay(reflectedRay, depth+1, currObject);
-				reflectedPhoton.intensity *= objects[indSource]->surface.specular;
-				returnLight = reflectedPhoton;
+				backwardReflection.normalize();
+				double cosangle = dot(backwardReflection, surfaceNormal);
+				if(false && cosangle >= 0.){
+					for(int i = 0; i < 4; ++i){
+						Vector jiggled = backwardReflection + randVector(objects[indSource]->surface.smoothness/cosangle);
+						Ray reflectedRay(minPoint, jiggled);
+						Spectrum reflectedSpectrum = traceRay(reflectedRay, depth+1, currObject);
+
+						reflectedSpectrum = reflectedSpectrum * objects[indSource]->surface.specular;
+						returnLight = returnLight + reflectedSpectrum*.25;
+					}
+				}else{
+						Ray reflectedRay(minPoint, backwardReflection);
+						Spectrum reflectedSpectrum = traceRay(reflectedRay, depth+1, currObject);
+
+						reflectedSpectrum = reflectedSpectrum * objects[indSource]->surface.specular;
+						returnLight = returnLight + reflectedSpectrum;
+					
+				}
 			}
-			
+
 			if (depth < MAXDEPTH && objects[indSource]->surface.transmissive > 0.0){
 				double currRefraction = 1.0003;
 				if (currObject != -1){
@@ -795,25 +1092,46 @@ struct Tracer{
 				double cosi = dot(surfaceNormal, backwardView);
 				Vector refractedVector = refractionVal*viewVector + (refractionVal*cosi - sqrt(1 + pow(refractionVal, 2) * (pow(cosi, 2) - 1)))*surfaceNormal;
 				Ray refractedRay(minPoint, refractedVector);
-				Photon refractedPhoton = traceRay(refractedRay, depth+1, nextObject);
-				if(nextObject != -1){
-					refractedPhoton.intensity *= objects[indSource]->surface.transmissive;
-				}
-				returnLight = returnLight + refractedPhoton;
-			}
-			
-			double diffuseIntensity = max(dot(lightVector, surfaceNormal), AMBIENT)*objects[indSource]->surface.diffuse;
-			if(indShadow == -1){
-				Vector reflection = lightVector - 2.*dot(lightVector, surfaceNormal)*surfaceNormal;
+				Spectrum refractedSpectrum = traceRay(refractedRay, depth+1, nextObject);
 
-				double specularIntensity = max(0., pow(dot(reflection, viewVector),10))*objects[indSource]->surface.specular; 
-				Photon shiny(lightSpectrum,specularIntensity);
-				returnLight = returnLight + shiny;
-				
-			}else{	
-				diffuseIntensity =  AMBIENT*objects[indSource]->surface.diffuse;
+				refractedSpectrum = refractedSpectrum*objects[indSource]->surface.transmissive;
+				returnLight = returnLight + refractedSpectrum;
 			}
-			Photon diffuse =  Photon(objects[indSource]->surface.spectrum, diffuseIntensity);
+
+			for(int i = 0; i < lights.size(); ++i){
+				Light light = lights[i];
+				Ray shadow(minPoint, light.p);
+				int indShadow = -1;
+				double minDistS = light.p.dist(minPoint);
+				Point minPointS(INF, INF, INF);
+
+				for (int o = 0; o < objects.size(); ++o){
+					Point intersect = objects[o]->intersection(shadow);
+					double dist = intersect.dist(minPoint);
+					if (dist < minDistS){
+						minDistS = dist;
+						indShadow = o;
+						minPointS = intersect;
+						break;
+					}
+				}
+
+				if(indShadow == -1){
+					Vector lightVector = shadow.v;
+					lightVector.normalize();
+					double diffuseIntensity = max(0., dot(lightVector, surfaceNormal));
+					Vector reflection = lightVector - 2.*dot(lightVector, surfaceNormal)*surfaceNormal;
+
+					double specularIntensity = pow(max(0.,dot(reflection, viewVector)),objects[indSource]->surface.smoothness)*objects[indSource]->surface.specular; 
+					returnLight = returnLight + light.spectrum*specularIntensity;
+
+					diffuseIntensity *= objects[indSource]-> surface.diffuse;
+					Spectrum diffuse = objects[indSource]->surface.spectrum*light.spectrum*diffuseIntensity;
+					returnLight = returnLight + diffuse;
+
+				}
+			}
+			Spectrum diffuse = objects[indSource]->surface.spectrum * ambient * objects[indSource]->surface.diffuse;
 			returnLight = returnLight + diffuse;
 		}
 		return returnLight;
@@ -821,34 +1139,38 @@ struct Tracer{
 
 
 	void drawScene(){
-		for (int j = 0; j < HEIGHT; ++j){
-			for(int i = 0; i < WIDTH; ++i){
-				Photon p(380, 750, .0);
-						double xoff = (i-WIDTH/2)*PIXSIZE;
-						double yoff = (HEIGHT/2-j)*PIXSIZE;
+		img = new CImg<char>(width,height,1,3,0);
+		for (int j = 0; j < height; ++j){
+			for(int i = 0; i < width; ++i){
+				Spectrum out;
+				for(int x = 0; x < 1; x += 2){
+					for(int y = 0; y < 1; y += 2){
+						double xoff = (i-width/2 + x/2)*pixsize;
+						double yoff = (height/2-j + y/2)*pixsize;
 						Point px = (*focal)+(*dir)+xoff*(*horz) + yoff*(*vert);
-						Ray r(*focal, px);
-						Photon q = traceRay(r, 1, -1);
-						//q.intensity /= 9;
-						p = p+q;
-				RGB c = p.rgb();
-
-				(*img)(i,j,0) = c.r;
-				(*img)(i,j,1) = c.g;
-				(*img)(i,j,2) = c.b;
-
+						Vector d (*focal, px);
+						Ray r(px, d);
+						out = out + (traceRay(r, 1, -1));
+					}
+				}
+				XYZ outColor = XYZ(out);
+				RGB rgb = outColor.rgb();
+				(*img)(i,j,0) = rgb.r;
+				(*img)(i,j,1) = rgb.g;
+				(*img)(i,j,2) = rgb.b;
 			}
 		}
 	}
 };
 
-int main() {
+int main(int argc, char *argv[]) {
 	red = colorSpec(610, 25);
 	green = colorSpec(540, 30);
 	blue = colorSpec(445, 25);
 	Tracer t;
-	t.read("in.txt");
+	t.read(argv[1]);
 	t.drawScene();
 	t.img->save("out.bmp");
+
 	return 0;
 }
