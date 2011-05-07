@@ -1,0 +1,153 @@
+Width 2000
+Height 2000
+Ambient .4
+Focal -20	-16	20
+Focal	-13	-15	10
+
+Light
+Point	400	100	-500
+Spectrum	380	750
+Intensity	1.3
+
+Light
+Point	-300	1000 -400
+Spectrum	380	750
+Intensity	1
+
+Sphere	
+Point	-30.0	-10.0 	50.0 
+Radius	10.0
+Surface	
+Spectrum Magenta
+Constants .8	.2 .0 	1.1 5
+
+Sphere	
+Point	-10.0 	-10.0 	60.0 
+Radius	10.0
+Surface	
+Spectrum 600	750
+Constants .8 .2 	0	0 40
+
+Sphere
+Point	10.0 	-10.0 	80.0
+Radius	10.0
+Surface
+Spectrum	495 	570
+Constants	.8 	.2 	0 	0 10
+
+Sphere
+Point	30.0 	-10.0 	90.0
+Radius	10.0
+Surface
+Spectrum	380 750
+Constants	.1 .9 0 1.3 200
+
+Sphere
+Point		-7 	-19.0 	40.0
+Radius	1.0
+Surface
+Spectrum	380 	750
+Constants	.0 .3 0.7 1.3 100
+
+Ellipsoid
+	Center -7	-19	40
+	Radii	.8	.1	.25
+	Surface
+		Spectrum 600 750
+		Constants 2	.1	0	0	10
+Ellipsoid
+	Center -7	-19	40
+	Radii	.8	.25	.1
+	Surface
+		Spectrum 500 650
+		Constants 2	.1	0	0	10
+
+Sphere
+Point	-2.0 	-19.0 	38
+Radius	1.0
+Surface
+Spectrum	380 	750
+Constants	.0 .3 0.7 1.3 100
+
+Ellipsoid
+	Center -2	-19	38
+	Radii	.25	.1	.8
+	Surface
+		Spectrum 380 450
+		Constants 2	.1	0	0	10
+Ellipsoid
+	Center -2 -19	38
+	Radii	.1	.25	.8
+	Surface
+		Spectrum 400 600
+	Constants 2	.1	0	0	10
+
+Sphere
+Point		-20 	-19.0 	25
+Radius	1.0
+Surface
+Spectrum	380 	750
+Constants	.0 .3 0.7 1.3 100
+
+Ellipsoid
+	Center -20	-19	25
+	Radii	.25	.8	.1
+	Surface
+		Spectrum 380 450
+		Constants 2	.1	0	0	10
+Ellipsoid
+	Center -20 -19	25
+	Radii	.1	.8	.25
+	Surface
+		Spectrum 380 550
+		Constants 2	.1	0	0	10
+
+Sphere
+Point		-13 	-19.0 	30
+Radius	1.0
+Surface
+Spectrum	380 	750
+Constants	.0 .3 0.7 1.3 100
+
+Ellipsoid
+	Center -13	-19	30
+	Radii	.25	.1	.8
+	Surface
+		Spectrum Magenta
+		Constants 2	.1	0	0	10
+Ellipsoid
+	Center -13 -19	30
+	Radii	.1	.25	.8
+	Surface
+		Spectrum 500	750
+		Constants 2	.1	0	0	10
+
+Sphere
+Point		-10 	-19.0 	18
+Radius	1.0
+Surface
+Spectrum	380 	750
+Constants	.0 .3 0.7 1.3 100
+
+Ellipsoid
+	Center -10	-19	18
+	Radii	.25	.1	.8
+	Surface
+		Spectrum Magenta
+		Constants 2	.1	0	0	10
+Ellipsoid
+	Center -10 -19	18
+	Radii	.1	.25	.8
+	Surface
+		Spectrum 500	750
+		Constants 2	.1	0	0	10
+
+
+
+Plane
+Point	00.0	-20.0	00.0
+Vector	00.0	1.00	0.0
+Surface
+Spectrum	380		750
+Constants	.5	.1	0	0 10
+

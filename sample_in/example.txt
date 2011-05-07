@@ -1,0 +1,71 @@
+Width 2000
+Height 2000
+Ambient .4
+Focal	-10	15	-90
+
+Light
+	Point	1000	1000	 -1000
+	Spectrum	380	750
+	Intensity	.6
+	
+Light
+	Point	-200	1000	-1000
+	Spectrum	380	750
+	Intensity	1
+
+Ellipsoid
+	Center 20	0	-10
+	Radii	15	2	15
+	Surface
+		Spectrum 380 750
+		Constants 1	0	0	0	10
+
+Ellipsoid
+	Center -25	0	-30
+	Radii	5	10	10
+	Surface
+		Spectrum 380 750
+		Constants 0	.3	.7	1.3	100
+
+Light
+	Point	-300	500	100
+	Spectrum	380	750
+	Intensity	.6
+
+Sphere
+	Point	45	0	30.
+	Radius	20
+	Surface
+		Spectrum	600	750
+		Constants	.1	.9	0	0 100
+Sphere
+	Point	-60	0	20.
+	Radius	20
+	Surface
+		Spectrum	495	570
+		Constants	.8	.2	0	0 100
+Sphere
+	Point	-20	0	-10.
+	Radius	6.
+	Surface
+		Spectrum	600	750
+		Constants	1	0	0	0 100
+
+Plane
+	Point	00.0	-20.0	00.0
+	Vector	00.0	1.00	0.0
+	Surface
+		Spectrum	380		750
+		Constants	.5	.0	0	0 10
+Quadric
+	Constants	2 -1 2 0 0 0 0 0 0 0
+	Surface
+		Spectrum 380 500
+		Constants	1	0	0	0 10
+Polygon
+	Point	-40	0	-5
+	Point	-40	20	-5
+	Point	-30	0	15
+	Surface
+		Spectrum Magenta
+		Constants	1	0	0	0	10

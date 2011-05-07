@@ -1170,7 +1170,7 @@ int main(int argc, char *argv[]) {
 	Tracer t;
 	t.read(argv[1]);
 	t.drawScene();
-	t.img->save("out.bmp");
+	t.img->save(argv[2]);
 
 	return 0;
 }

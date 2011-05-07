@@ -1,0 +1,63 @@
+Width 1680
+Height 1050
+Ambient .4
+Focal	-10	-15	-15
+Light
+	Point	1000	1000	-1000
+	Spectrum	380	750
+	Intensity	1
+
+Light
+	Point	-300	500	100
+	Spectrum	380	750
+	Intensity	.6
+
+Sphere	
+	Point	-40.0	-10.0 	50.0 
+	Radius	10.0
+	Surface	
+		Spectrum Magenta
+		Constants .8	.2 .0 	1.1 5
+
+Sphere	
+	Point	-20.0 	-10.0 	60.0 
+	Radius	10.0
+	Surface	
+		Spectrum 600	750
+		Constants .8 .2 	0	0 40
+
+Sphere
+	Point	20.0 	-10.0 	80.0
+	Radius	10.0
+	Surface
+		Spectrum	495 	570
+		Constants	.8 	.2 	0 	0 10
+Sphere
+	Point	-10.0 	-18.0 	0.0
+	Radius	2.0
+	Surface
+		Spectrum	380 	750
+		Constants	.0 .2 0.8 1.3 200
+Sphere
+	Point	10.0 	-18.0 	0.0
+	Radius	2.0
+	Surface
+		Spectrum	380 	750
+		Constants	.0 .3 0.7 1.3 100
+Sphere
+	Point	40.0 	-10.0 	90.0
+	Radius	10.0
+	Surface
+		Spectrum	380 750
+		Constants	.1 .9 0 1.3 200
+Plane
+	Point	00.0	-20.0	00.0
+	Vector	00.0	1.00	0.0
+	Surface
+		Spectrum	380		750
+		Constants	.3	.1	0	0 10
+Quadric
+	Constants	1 0 1 0 0 0 0 1 0 0
+	Surface
+		Spectrum 500 650
+		Constants	.5	.5	0	0 10
