@@ -139,29 +139,6 @@ struct Spectrum{
 		}
 		cout << "|------------------|\n";
 	}
-	/*
-	   RGB rgb(){
-	   RGB color(0,0,0);
-	   Spectrum r1 = Spectrum(380,475);
-	   Spectrum r2 = Spectrum(570, 750);
-	   Spectrum b = Spectrum(380, 495);
-	   Spectrum g = Spectrum(508, 631);
-
-	   double rmag = r1.magnitude() + r2.magnitude();
-	   double gmag = g.magnitude();
-	   double bmag = b.magnitude();
-
-	   Spectrum rInt1 = intersection(r1);
-	   Spectrum rInt2 = intersection(r2);
-	   Spectrum gInt = intersection(g);
-	   Spectrum bInt = intersection(b);
-
-	   color.r = (unsigned char)((rInt1.magnitude() + rInt2.magnitude()) * 255/rmag);
-	   color.g = (unsigned char)((gInt.magnitude()) * 255/gmag);
-	   color.b = (unsigned char)((bInt.magnitude()) * 255/bmag);
-	   return color;
-	   }
-	 */
 };
 
 Spectrum red;
@@ -234,7 +211,6 @@ istream &operator>>(istream &stream, Spectrum &s){
 	double low, high;
 	stream >> low >> high;
 	s = Spectrum(low, high);
-	//s.normalize(1.);
 	return stream;
 }
 
@@ -283,39 +259,6 @@ struct XYZ{
 		maxv = 1;
 	}
 	RGB rgb(){
-	/*	
-		double r = 3.2406*x + -1.5372*y + -.4986*z;
-		double g = -.9689*x + 1.8758*y + .0415*z;
-		double b = .0557*x + -.204*y + 1.057*z;
-
-		r *= scale;
-		g *= scale;
-		b *= scale;
-
-		double a = .055;
-
-		if(r <= .0031308){
-			r *= 12.92;
-		}else{
-			r = pow(r, 1./2.4)*(1+a) - a;
-		}
-
-		if(g <= .0031308){
-			g *= 12.92;
-		}else{
-			g = pow(g, 1./2.4)*(1+a) - a;
-		}
-
-		if(b <= .0031308){
-			b *= 12.92;
-		}else{
-			b = pow(b, 1./2.4)*(1+a) - a;
-		}
-		double sum = r+g+b;
-		r = r/sum;
-		g = g/sum;
-		b = b/sum;
-*/
 		double r = min(x*255, 255.);
 		double g = min(y*255, 255.);
 		double b = min(z*255, 255.);
@@ -339,7 +282,6 @@ struct Surface{
 		transmissive = _transmissive;
 		refraction = _refraction;
 		smoothness = _smoothness;
-		//spectrum.normalize(1.);
 	}
 	Surface(){
 	}
@@ -478,46 +420,6 @@ struct Quadric : public Object{
 	}
 	virtual Point intersection(Ray &r){
 		r.v.normalize();
-		/*double NB = 2*B;
-		double NC = 2*C;
-		double ND = 2*D;
-		double NF = 2*F;
-		double NG = 2*G;
-		double NI = 2*I;
-
-		double Cq = r.p.x*(A*r.p.x + NB*r.p.y + NC*r.p.z + ND) + \
-					r.p.y*(E*r.p.y + NF*r.p.z + NG) + \
-					r.p.z*(H*r.p.z + NI) + J;
-
-		double NBq = r.v.x*(A*r.p.x + B*r.p.y + C*r.p.z + D) + \
-					r.v.y*(B*r.p.x + E*r.p.y + F*r.p.z + G) + \
-					r.v.z*(C*r.p.x + F*r.p.y + H*r.p.z + I);
-
-		double Aq = r.v.x*(A*r.v.x + NB*r.v.y + NC*r.v.z) + \
-					r.v.y*(E*r.v.y + NF*r.v.z) + \
-					H*r.v.z*r.v.z;
-		if(Aq == 0.){
-			return Point(INF, INF,INF);
-		}
-		double Ka = -NBq/Aq;
-		double Kb = Cq/Aq;
-		double det = Ka*Ka - Kb;
-		if(det < 0.){
-			return Point(INF, INF , INF);
-		}
-
-		
-		double t0 = Ka - sqrt(det);
-		double t1 = Ka + sqrt(det);
-		
-		if (t0 < ERR && t1 < ERR){
-			return Point(INF, INF , INF);
-		}
-		if (t0 < ERR) t0 = INF;
-		if(t1 < ERR) t1 = INF;
-		t0 = min(t1, t0);
-		return r.p + t0*r.v;
-		*/
 		Vector V1(r.v.x*r.v.x, r.v.y*r.v.y, r.v.z*r.v.z);
 		Vector V2 = 2.*Vector(r.v.x*r.v.y, r.v.y*r.v.z, r.v.x*r.v.z);
 		Vector V3 = 2.*Vector(r.v.x*r.p.x, r.v.y*r.p.y, r.v.z*r.p.z);

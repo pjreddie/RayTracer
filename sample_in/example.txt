@@ -1,5 +1,5 @@
-Width 2000
-Height 2000
+Width 480
+Height 320
 Ambient .4
 Focal	-10	15	-90
 
